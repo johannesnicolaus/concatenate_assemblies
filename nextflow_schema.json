@@ -23,6 +23,16 @@
                     "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row.",
                     "fa_icon": "fas fa-file-csv"
                 },
+                "delimiter": {
+                    "type": "string",
+                    "default": "#",
+                    "description": "Delimiter to use in FASTA headers"
+                },
+                "contigs_file": {
+                    "type": "string",
+                    "description": "Optional text file with accepted contig names (one per line)",
+                    "help_text": "If provided, only contigs listed in this file will be included in the combined output"
+                },
                 "outdir": {
                     "type": "string",
                     "format": "directory-path",

@@ -1,0 +1,6 @@
+name: bgzip_compress
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - htslib=1.17
