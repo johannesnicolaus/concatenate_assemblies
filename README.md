@@ -13,17 +13,8 @@
 
 ## Introduction
 
-**nf-core/concatenate_assemblies** is a bioinformatics pipeline that ...
+**nf-core/concatenate_assemblies** is a bioinformatics pipeline that creates a fasta files following the [PanSN-spec guidelines](https://github.com/pangenome/PanSN-spec) compatible with [nf-core/pangenome](https://nf-co.re/pangenome/) or PGGB.
 
-<!-- TODO nf-core:
-   Complete this sentence with a 2-3 sentence summary of what types of data the pipeline ingests, a brief overview of the
-   major pipeline sections and the types of output it produces. You're giving an overview to someone new
-   to nf-core here, in 15-20 seconds. For an example, see https://github.com/nf-core/rnaseq/blob/master/README.md#introduction
--->
-
-<!-- TODO nf-core: Include a figure that guides the user through the major workflow steps. Many nf-core
-     workflows use the "tube map" design for that. See https://nf-co.re/docs/guidelines/graphic_design/workflow_diagrams#examples for examples.   -->
-<!-- TODO nf-core: Fill in short bullet-pointed list of the default steps in the pipeline -->
 
 ## Usage
 
