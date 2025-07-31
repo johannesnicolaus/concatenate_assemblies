@@ -8,7 +8,7 @@ process CREATE_COMBINED_FASTA {
         'nf-core/ubuntu:20.04' }"
 
     input:
-    path(fastas)
+    path(contig_files, stageAs: "by_contig/*")
     path(contigs_file)
 
     output:
@@ -18,38 +18,42 @@ process CREATE_COMBINED_FASTA {
     when:
     task.ext.when == null || task.ext.when
 
+
     script:
-    def contigs_filter = contigs_file.name != 'NO_FILE' ? "--contigs-file ${contigs_file}" : ""
     """
-    # Create combined FASTA with optional contig filtering
+    # Create combined FASTA using contig files
     if [ "${contigs_file.name}" != "NO_FILE" ]; then
-        # Filter by accepted contigs
+        # Filter by allowed contigs in the order they appear in the contigs file
+        > all_concatenated.fa
+        
+        # Ensure the contigs file ends with a newline
+        cp ${contigs_file} temp_contigs.txt
+        [ -n "\$(tail -c1 temp_contigs.txt)" ] && echo >> temp_contigs.txt
+        
         while IFS= read -r contig; do
+            # Skip empty lines and clean whitespace
+            contig=\$(echo "\$contig" | sed 's/^[[:space:]]*//;s/[[:space:]]*\$//')
             [ -z "\$contig" ] && continue
-            for fasta in ${fastas}; do
-                awk -v contig="\$contig" '
-                BEGIN { in_contig = 0 }
-                /^>/ {
-                    if (\$0 ~ contig "\$" || \$0 ~ contig "[^a-zA-Z0-9_-]") {
-                        in_contig = 1
-                        print
-                    } else {
-                        in_contig = 0
-                    }
-                    next
-                }
-                in_contig { print }
-                ' "\$fasta"
-            done
-        done < ${contigs_file} > all_concatenated.fa
+            
+            # Check if the contig file exists and concatenate it
+            contig_file="by_contig/\${contig}.fa"
+            if [ -f "\$contig_file" ]; then
+                echo "Adding contig: \$contig"
+                cat "\$contig_file" >> all_concatenated.fa
+            else
+                echo "Warning: No file found for contig \$contig (\$contig_file)"
+            fi
+        done < temp_contigs.txt
+        
+        rm -f temp_contigs.txt
     else
-        # No filtering, concatenate all
-        cat ${fastas} > all_concatenated.fa
+        # No filtering, concatenate all contig files
+        cat by_contig/*.fa > all_concatenated.fa
     fi
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        awk: \$(awk --version 2>&1 | head -n1 | cut -d' ' -f3 | cut -d',' -f1)
+        cat: \$(cat --version 2>&1 | head -n1 | cut -d' ' -f4)
     END_VERSIONS
     """
 }

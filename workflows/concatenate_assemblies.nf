@@ -89,18 +89,17 @@ workflow CONCATENATE_ASSEMBLIES {
     ch_versions = ch_versions.mix(CONCATENATE_BY_HAPLOTYPE.out.versions.first())
 
     //
-    // Step 5: Create combined FASTA file
+    // Step 5: Create combined FASTA file using contig files
     //
-    ch_all_renamed_fastas = RENAME_FASTA_HEADERS.out.fasta
-        .map { meta, fasta -> fasta }
-        .collect()
-
     ch_contigs_filter = params.contigs_file ? 
         Channel.fromPath(params.contigs_file) : 
         Channel.fromPath("$projectDir/assets/NO_FILE").first()
 
+    // Collect all contig files from CONCATENATE_BY_CONTIG
+    ch_all_contig_files = CONCATENATE_BY_CONTIG.out.fasta.collect()
+
     CREATE_COMBINED_FASTA (
-        ch_all_renamed_fastas,
+        ch_all_contig_files,
         ch_contigs_filter
     )
     ch_versions = ch_versions.mix(CREATE_COMBINED_FASTA.out.versions)
